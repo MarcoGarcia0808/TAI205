@@ -1,0 +1,11 @@
+#se pueden orquestar 2 o mas contenedores,
+#cada uno con su propia imagen, y se pueden comunicar entre ellos para un mismo proyecto
+
+services:
+  api:
+    build: .
+    container_name: server_FastAPI
+    ports:
+      - "5000:5000"       
+    volumes:
+      - ./app:/app/app
