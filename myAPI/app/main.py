@@ -2,6 +2,7 @@
 from fastapi import FastAPI, status, HTTPException
 from typing import Optional
 import asyncio
+from pydantic import BaseModel, Field #agregar basemodel pydantic
 
 #2. Inicialización de la aplicación
 app = FastAPI(title="Mi primer API", 
@@ -17,6 +18,11 @@ usuarios=[
     {"id":3, "nombre":"Luis", "edad":"23"},
 ]
 
+class crear_usuario(BaseModel):
+    id: int = Field(..., gt=0, description="Identificador de usuario")
+    nombre: str = Field(..., min_length=3, max_length=50, example="Juanita")
+    edad: int = Field(..., ge=1, le=123, description="Edad valida entre 1 y 123")
+    
 #3. endpoints de la API
 @app.get("/", tags=['inicio'])
 async def holaMundo():
@@ -55,7 +61,7 @@ async def consultaOp(id: Optional[int] = None):
         return { "Aviso": "No se proporcionó ningún ID"}
     
 @app.get("/v1/usuarios/", tags=['CRUD HTTP'])
-async def consultaT ():
+async def consultaT():
     return{
         
         "status":"200",
@@ -64,10 +70,10 @@ async def consultaT ():
         
     }
     
-@app.post("/v1/usuarios/}", tags=['CRUD HTTP'])
-async def crea_usuario(usuario:dict):
+@app.post("/v1/usuarios/", tags=['CRUD HTTP'],status_code=status.HTTP_201_CREATED)
+async def crea_usuario(usuario:crear_usuario):
     for usr in usuarios:
-        if usr["id"] == usuario.get("id"):
+        if usr["id"] == usuario.id:
             raise HTTPException(
                 status_code=400,
                 detail="El id ya existe"
@@ -79,7 +85,7 @@ async def crea_usuario(usuario:dict):
         "usuario": usuario
     }
     
-@app.put("/v1/usuarios/", tags=['CRUD HTTP'])
+@app.put("/v1/usuarios/{id}", tags=['CRUD HTTP'])
 async def actualiza_usuario(id: int, datos: dict):
 
     for usuario in usuarios:
@@ -97,8 +103,7 @@ async def actualiza_usuario(id: int, datos: dict):
     )
 
 
-# DELETE - Eliminar usuario
-@app.delete("/v1/usuarios/", tags=['CRUD HTTP'])
+@app.delete("/v1/usuarios/{id}", tags=['CRUD HTTP'])
 async def elimina_usuario(id: int):
 
     for index, usuario in enumerate(usuarios):
