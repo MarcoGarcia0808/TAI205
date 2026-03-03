@@ -1,0 +1,20 @@
+$kind: http-request
+name: http://localhost:8000/libros
+url: http://localhost:8000/libros
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"nombre\": \"principito\",\r
+
+    \  \"autor\": \"Marco garcía\",\r
+
+    \  \"año\": 1800,\r
+
+    \  \"paginas\": -1,\r
+
+    \  \"estado\": \"disponible\"\r
+
+    }"
+order: 1772487156116

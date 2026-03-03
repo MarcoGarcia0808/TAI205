@@ -1,0 +1,8 @@
+$kind: http-request
+name: http://localhost:8000/devolver/principito
+url: http://localhost:8000/devolver/principito
+method: PUT
+body:
+  type: json
+  content: ""
+order: 3747797809543290

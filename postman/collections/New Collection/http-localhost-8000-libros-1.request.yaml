@@ -1,0 +1,5 @@
+$kind: http-request
+name: http://localhost:8000/libros
+url: http://localhost:8000/libros/principito
+method: GET
+order: 2941444172378204

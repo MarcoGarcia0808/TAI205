@@ -1,0 +1,5 @@
+$kind: http-request
+name: http://localhost:8000/prestamos/principito
+url: http://localhost:8000/prestamos/principito
+method: DELETE
+order: 4017515483540209

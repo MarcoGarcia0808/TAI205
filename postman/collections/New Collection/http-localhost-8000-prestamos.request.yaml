@@ -1,0 +1,20 @@
+$kind: http-request
+name: http://localhost:8000/prestamos
+url: http://localhost:8000/devolver/principito
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \  \"nombre_libro\": \"principito\",\r
+
+    \  \"usuario\": {\r
+
+    \    \"nombre\": \"Marco\",\r
+
+    \    \"correo\": \"marco@email.com\"\r
+
+    \  }\r
+
+    }"
+order: 3436500678726526
