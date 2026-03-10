@@ -21,6 +21,8 @@ security = HTTPBasic()
 
 tipo_habitacion=('sencilla', 'doble','suite')
 
+reservas = []
+
 ##validaciones para campos: huesped minimo 5 caracteres, fecha de entrada no menor a fecha actual, fecha de salida mayor que fecha de entrada, estancia
 
 class Reserva(BaseModel):
@@ -43,21 +45,12 @@ class FechaEntrada(BaseModel):
     año: int = Field(..., gt=2026)
     
     
-    
 class Huesped(BaseModel):
     nombre: str = Field(..., min_length=5)
     apellido: str = Field(..., min_length=5)
     
 class estancia(BaseModel):
     dias: int = Field(..., gt=0, lt=8)
-
-
-
-
-
-
-
-
 
 
 
@@ -79,17 +72,58 @@ async def crear_reserva(reserva: dict, credentials: HTTPBasicCredentials = Depen
 
 
 
-##endpoint listar reserva
+##endpoint listar reserva con opcion de filtrar por tipo de habitacion y fecha de entrada
+@app.get("/reservas")
+async def listar_reservas(tipo_habitacion: Optional[str] = None, fecha_entrada: Optional[str] = None):
+
+    
+    if tipo_habitacion:
+        reservas = [reserva for reserva in reservas if reserva["tipo_habitacion"] == tipo_habitacion]
+    
+    if fecha_entrada:
+        reservas = [reserva for reserva in reservas if reserva["fecha_entrada"] == fecha_entrada]
+    
+    return {"reservas": reservas}
 
 
 
 ##endpoint Consultar reserva
-@app.get()
+@app.get("/reservas/{reserva_id}")
+async def consultar_reserva(reserva_id: int):   
+    reservas = []
+    
+    reserva = next((reserva for reserva in reservas if reserva["id"] == reserva_id), None)
+    
+    if reserva is None:
+        raise HTTPException(status_code=404, detail="Reserva no encontrada")
+    
+    return {"reserva": reserva}
 
-##confirmar reserva
-
-@app.()
-
+##endpoint para confirmar reserva, debe estar protegido por usuario: hotel y contraseña: r2026
+@app.post("/reservas/{reserva_id}/confirmar")
+async def confirmar_reserva(reserva_id: int, credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, "hotel")
+    correct_password = secrets.compare_digest(credentials.password, "r2026")
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    
+    return {"message": f"Reserva {reserva_id} confirmada exitosamente"}
 
 ##cancelar reserva debe estar protegido por usuario: hotel y contraseña: r2026
-@app.post()
+@app.delete("/reservas/{reserva_id}")
+async def cancelar_reserva(reserva_id: int, credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, "hotel")
+    correct_password = secrets.compare_digest(credentials.password, "r2026")
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    
+    return {"message": f"Reserva {reserva_id} cancelada exitosamente"}
+
