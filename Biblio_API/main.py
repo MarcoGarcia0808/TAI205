@@ -3,12 +3,16 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import Literal
 from datetime import datetime
 
+
+
+
 app = FastAPI(title="API Biblioteca Digital")
 
 libros = []
 prestamos = []
 
 
+##seguridad HTTP Basic
 
 class Libro(BaseModel):
     nombre: str = Field(..., min_length=2, max_length=100)
